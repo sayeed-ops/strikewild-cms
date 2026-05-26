@@ -1,0 +1,45 @@
+"use client";
+
+import { useState } from "react";
+import { faq } from "@/lib/faq";
+
+export default function FAQ() {
+  const [openIdx, setOpenIdx] = useState<number | null>(0);
+
+  const toggle = (i: number) => setOpenIdx((cur) => (cur === i ? null : i));
+
+  return (
+    <section className="block" id="faq">
+      <div className="container">
+        <div
+          className="section-head"
+          style={{
+            justifyContent: "center",
+            textAlign: "center",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <span className="label">// 05 · Frequently asked</span>
+            <h2 style={{ textAlign: "center" }}>Free spins, demystified</h2>
+          </div>
+        </div>
+
+        <div className="faq">
+          {faq.map((f, i) => (
+            <div key={i} className={`faq-item${openIdx === i ? " open" : ""}`}>
+              <button className="faq-q" type="button" onClick={() => toggle(i)}>
+                <span>{f.q}</span>
+                <span className="plus" />
+              </button>
+              <div className="faq-a">
+                <div className="inner">{f.a}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
