@@ -116,7 +116,7 @@ Editors should not have to wait for a developer to deploy. Set this up so publis
 2. Name: `Netlify rebuild`.
 3. URL: paste the Netlify build hook URL from 8a.
 4. Trigger on: **Create, Update, Delete**.
-5. Filter (GROQ): `_type in ["offer", "faq", "siteSettings"]`
+5. Filter (GROQ): `_type in ["offer", "faq", "siteSettings", "heroSection", "educationSection", "explainerSection", "otherDealsSection", "responsibleSection", "footerSection", "navSection"]`
 6. HTTP method: `POST`. Save.
 
 **8c. Test:**
@@ -147,11 +147,24 @@ Once migration is verified working end-to-end:
 ## How editors use the Studio
 
 1. Go to `https://strikewild.sanity.studio` and sign in.
-2. To edit an offer: click **Offers** → click any operator → change fields → **Publish**.
-3. To add a new offer: click **Offers** → **+** (top right) → fill in fields → **Publish**.
-4. To reorder offers: edit the `rank` field. Lower numbers = higher placement. Top 3 ranks automatically populate the "This week's top 3" section.
-5. To change site title / description / OG image: click **Site settings** → edit → **Publish**.
-6. Within ~2 minutes of publish, Netlify rebuilds and the live site updates.
+2. **Site content** group (left sidebar) holds every page section as a single document:
+   - **Site settings** — global SEO defaults
+   - **Navigation** — header links and CTA
+   - **Hero** — headline, subheadline, ticker stats, trust cards, CTAs
+   - **Education** — the two "2026 rules" cards
+   - **Explainer** — the four "free spins explained" cards (each card has an icon picker)
+   - **Other deals** — the cross-sell section
+   - **Responsible gaming** — intro, tools, body paragraphs, resource links
+   - **Footer** — about text, link columns, copyright, regulator badges
+3. **Offers** and **FAQ** are document lists below the divider — add, remove, reorder freely.
+4. To edit an offer: click **Offers** → click any operator → change fields → **Publish**.
+5. To add a new offer: click **Offers** → **+** (top right) → fill in fields → **Publish**.
+6. To reorder offers: edit the `rank` field. Lower numbers = higher placement. Top 3 ranks automatically populate the "This week's top 3" section on the homepage.
+7. Within ~2 minutes of publish, Netlify rebuilds and the live site updates.
+
+**Icons:** In the Explainer and Other deals sections, each card/item picks an icon from a fixed dropdown. The icon set is defined in [components/icons/registry.tsx](components/icons/registry.tsx) — to add a new option, a developer needs to add it there and to the dropdown list in the schema.
+
+**Empty fields:** If you blank out a field by accident, the site falls back to the default value (defined in [lib/sections/defaults.ts](lib/sections/defaults.ts)) instead of rendering blank. To intentionally hide a section, the site's component code needs to support that — ask a developer.
 
 ## Troubleshooting
 

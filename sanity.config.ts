@@ -1,10 +1,21 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
-import { schemaTypes } from "./sanity/schemas";
+import { schemaTypes, SINGLETON_TYPES } from "./sanity/schemas";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "your-project-id";
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
+
+const SINGLETONS: { id: string; type: string; title: string }[] = [
+  { id: "siteSettings", type: "siteSettings", title: "Site settings" },
+  { id: "navSection", type: "navSection", title: "Navigation" },
+  { id: "heroSection", type: "heroSection", title: "Hero" },
+  { id: "educationSection", type: "educationSection", title: "Education" },
+  { id: "explainerSection", type: "explainerSection", title: "Explainer" },
+  { id: "otherDealsSection", type: "otherDealsSection", title: "Other deals" },
+  { id: "responsibleSection", type: "responsibleSection", title: "Responsible gaming" },
+  { id: "footerSection", type: "footerSection", title: "Footer" },
+];
 
 export default defineConfig({
   name: "default",
@@ -18,13 +29,23 @@ export default defineConfig({
           .title("Content")
           .items([
             S.listItem()
-              .title("Site settings")
-              .id("siteSettings")
+              .title("Site content")
               .child(
-                S.editor()
-                  .id("siteSettings")
-                  .schemaType("siteSettings")
-                  .documentId("siteSettings")
+                S.list()
+                  .title("Site content")
+                  .items(
+                    SINGLETONS.map((s) =>
+                      S.listItem()
+                        .title(s.title)
+                        .id(s.id)
+                        .child(
+                          S.editor()
+                            .id(s.id)
+                            .schemaType(s.type)
+                            .documentId(s.id)
+                        )
+                    )
+                  )
               ),
             S.divider(),
             S.documentTypeListItem("offer").title("Offers"),
@@ -35,13 +56,12 @@ export default defineConfig({
   ],
   schema: {
     schemaTypes,
-    // Hide the singleton from the global "Create new" menu so editors
-    // don't accidentally create a second siteSettings document.
-    templates: (prev) => prev.filter((t) => t.schemaType !== "siteSettings"),
+    templates: (prev) =>
+      prev.filter((t) => !SINGLETON_TYPES.includes(t.schemaType)),
   },
   document: {
     actions: (prev, { schemaType }) =>
-      schemaType === "siteSettings"
+      SINGLETON_TYPES.includes(schemaType)
         ? prev.filter((a) => a.action !== "duplicate" && a.action !== "delete")
         : prev,
   },

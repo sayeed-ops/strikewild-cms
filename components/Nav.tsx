@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ResolvedNav } from "@/lib/sections/defaults";
 
-export default function Nav() {
+interface Props {
+  nav: ResolvedNav;
+}
+
+export default function Nav({ nav }: Props) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -25,19 +30,19 @@ export default function Nav() {
           />
         </a>
         <nav className="nav-links">
-          <a href="#offers">Free spins</a>
-          <a href="#rules">2026 rules</a>
-          <a href="#explained">Explained</a>
-          <a href="#faq">FAQ</a>
-          <a href="#responsible">Responsible</a>
+          {nav.links.map((link, i) => (
+            <a key={i} href={link.href}>
+              {link.label}
+            </a>
+          ))}
         </nav>
         <div className="nav-cta">
           <span className="nav-stat">
             <span className="dot" />
-            86,345 claimed today
+            {nav.liveStat}
           </span>
-          <a href="#offers" className="btn btn-primary btn-sm">
-            See top offers
+          <a href={nav.ctaHref} className="btn btn-primary btn-sm">
+            {nav.ctaLabel}
           </a>
         </div>
       </div>

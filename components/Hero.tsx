@@ -1,20 +1,26 @@
-const tickerItems: { l: string; v: string; c?: "y" }[] = [
-  { l: "OFFERS CLAIMED TODAY", v: "86,345", c: "y" },
-  { l: "OPERATORS REVIEWED", v: "17" },
-  { l: "AVG PAYOUT", v: "4.2 days" },
-  { l: "NEW RULES", v: "JAN 2026" },
-  { l: "NO DEPOSIT PICKS", v: "3" },
-  { l: "NO WAGERING OFFERS", v: "12", c: "y" },
-  { l: "EXCLUSIVE OFFERS", v: "2" },
-  { l: "UKGC LICENSED", v: "100%", c: "y" },
-];
+import type { ResolvedHero } from "@/lib/sections/defaults";
 
-export default function Hero() {
-  const tickerItem = (t: (typeof tickerItems)[number], i: number) => (
+interface Props {
+  hero: ResolvedHero;
+}
+
+export default function Hero({ hero }: Props) {
+  const tickerLine = hero.ticker.map((t, i) => (
     <span key={i}>
-      ▸ {t.l} <span className={`v ${t.c ?? ""}`}>{t.v}</span>
+      ▸ {t.label}{" "}
+      <span className={`v ${t.highlight ? "y" : ""}`}>{t.value}</span>
     </span>
-  );
+  ));
+
+  const renderSuffixLines = () => {
+    const lines = hero.headlineSuffix.split("\n");
+    return lines.map((line, i) => (
+      <span key={i}>
+        {i > 0 && <br />}
+        {line}
+      </span>
+    ));
+  };
 
   return (
     <section className="hero">
@@ -39,59 +45,43 @@ export default function Hero() {
       <div className="container">
         <span className="eyebrow">
           <span className="dot-y" />
-          UKGC Licensed · Updated 26 May 2026
+          {hero.eyebrow}
         </span>
         <h1 className="hero-h">
-          The <span className="hi">best free spins</span> in the UK.
-          <br />
-          No fluff, no fine print.
+          {hero.headlinePrefix}
+          <span className="hi">{hero.headlineHighlight}</span>
+          {renderSuffixLines()}
         </h1>
-        <p className="sub">
-          Every offer below is verified, fully compliant with the new 10× wagering cap, and ranked by
-          what actually pays out — not by who pays us more.
-        </p>
+        <p className="sub">{hero.subheadline}</p>
         <div className="cta-row">
-          <a href="#offers" className="btn btn-primary btn-lg">
-            See top offers <span style={{ fontSize: 18 }}>→</span>
+          <a href={hero.primaryCtaHref} className="btn btn-primary btn-lg">
+            {hero.primaryCtaLabel} <span style={{ fontSize: 18 }}>→</span>
           </a>
-          <a href="#how" className="btn btn-ghost btn-lg">
-            How we rank operators
+          <a href={hero.ghostCtaHref} className="btn btn-ghost btn-lg">
+            {hero.ghostCtaLabel}
           </a>
-          <span className="legal mono">// 18+ · BeGambleAware.org</span>
+          <span className="legal mono">{hero.legal}</span>
         </div>
       </div>
 
       <div className="ticker-wrap" style={{ marginTop: 64 }}>
         <div className="ticker" id="ticker">
-          {tickerItems.map(tickerItem)}
-          {tickerItems.map((t, i) => tickerItem(t, i + tickerItems.length))}
+          {tickerLine}
+          {tickerLine}
         </div>
       </div>
 
       <div className="container">
         <div className="trust">
-          <div className="trust-item">
-            <div className="v">
-              <span className="y">10×</span>
+          {hero.trustCards.map((c, i) => (
+            <div key={i} className="trust-item">
+              <div className="v">
+                {c.highlightValue ? <span className="y">{c.value}</span> : c.value}
+              </div>
+              <div className="l">{c.label}</div>
+              <div className="d">{c.description}</div>
             </div>
-            <div className="l">Max wagering cap</div>
-            <div className="d">New UKGC rule effective Jan 2026 — every offer complies.</div>
-          </div>
-          <div className="trust-item">
-            <div className="v">17</div>
-            <div className="l">Operators reviewed</div>
-            <div className="d">Only UKGC-licensed casinos make the list.</div>
-          </div>
-          <div className="trust-item">
-            <div className="v">£0</div>
-            <div className="l">No-deposit picks</div>
-            <div className="d">Try real games before risking a penny of your own.</div>
-          </div>
-          <div className="trust-item">
-            <div className="v">&lt;24h</div>
-            <div className="l">Avg withdrawal</div>
-            <div className="d">Median payout time on our top 5 operators.</div>
-          </div>
+          ))}
         </div>
       </div>
     </section>

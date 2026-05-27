@@ -12,7 +12,7 @@ import { getContent } from "@/lib/data";
 import { buildHomepageJsonLd } from "@/lib/seo/jsonLd";
 
 export default async function Page() {
-  const { offers, faq } = await getContent();
+  const { offers, faq, sections } = await getContent();
   const jsonLd = buildHomepageJsonLd(offers, faq);
 
   return (
@@ -21,18 +21,18 @@ export default async function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd }}
       />
-      <Nav />
+      <Nav nav={sections.nav} />
       <main>
-        <Hero />
+        <Hero hero={sections.hero} />
         <Top3 offers={offers} />
         <FilterableOffers offers={offers} />
-        <Education />
-        <Explainer />
+        <Education education={sections.education} />
+        <Explainer explainer={sections.explainer} />
         <FAQ faq={faq} />
-        <OtherDeals />
-        <Responsible />
+        <OtherDeals otherDeals={sections.otherDeals} />
+        <Responsible responsible={sections.responsible} />
       </main>
-      <Footer />
+      <Footer footer={sections.footer} />
     </>
   );
 }
