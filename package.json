@@ -9,8 +9,7 @@
     "lint": "next lint",
     "studio:dev": "sanity dev",
     "studio:build": "sanity build",
-    "studio:deploy": "sanity deploy",
-    "migrate": "node scripts/migrate-to-sanity.mjs"
+    "studio:deploy": "sanity deploy"
   },
   "dependencies": {
     "@portabletext/react": "^6.2.0",
