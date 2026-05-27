@@ -6,17 +6,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "studio:dev": "sanity dev",
+    "studio:build": "sanity build",
+    "studio:deploy": "sanity deploy",
+    "migrate": "node scripts/migrate-to-sanity.mjs"
   },
   "dependencies": {
+    "@portabletext/react": "^6.2.0",
     "next": "^16.2.6",
+    "next-sanity": "^13.0.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
   "devDependencies": {
+    "@sanity/vision": "^5.27.0",
     "@types/node": "22.10.7",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
+    "sanity": "^5.27.0",
+    "styled-components": "^6.4.2",
     "typescript": "5.7.3"
   }
 }

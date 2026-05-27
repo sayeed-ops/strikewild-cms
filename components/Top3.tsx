@@ -1,4 +1,44 @@
-export default function Top3() {
+import type { Offer } from "@/lib/data";
+
+interface Props {
+  offers: Offer[];
+}
+
+const RANK_LABELS = ["🏆 Best overall", "2nd", "3rd"];
+
+function pluralPills(o: Offer): { className: string; label: string }[] {
+  const pills: { className: string; label: string }[] = o.tags.map((t) => ({
+    className: `pill ${t.color}`,
+    label: t.label,
+  }));
+  pills.push({
+    className: "pill",
+    label: `${o.slots.toLocaleString()} slots`,
+  });
+  if (o.payoutDays <= 1) {
+    pills.push({ className: "pill", label: "24h withdrawal" });
+  }
+  return pills;
+}
+
+function rankBadge(o: Offer, i: number): string {
+  if (i === 0) return RANK_LABELS[0];
+  if (o.ribbon === "exclusive") return `${RANK_LABELS[i]} · Exclusive`;
+  return RANK_LABELS[i];
+}
+
+function ctaText(o: Offer, i: number): string {
+  if (i === 0) {
+    const spins = o.title.match(/\d+/)?.[0];
+    return spins ? `Claim ${spins} spins` : "Claim offer";
+  }
+  if (o.ribbon === "exclusive") return "Claim exclusive";
+  return "Play now";
+}
+
+export default function Top3({ offers }: Props) {
+  const top = offers.filter((o) => o.rank <= 3).sort((a, b) => a.rank - b.rank);
+
   return (
     <section className="block" id="offers">
       <div className="container">
@@ -13,73 +53,35 @@ export default function Top3() {
         </div>
 
         <div className="top3">
-          <article className="pcard featured">
-            <span className="rank-badge">🏆 Best overall</span>
-            <div className="logo">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="brand-img" src="/assets/logos/MRQ.svg" alt="MrQ" />
-            </div>
-            <h3 className="offer">300 Cash Spins</h3>
-            <div className="offer-tag">No wagering · No code needed</div>
-            <div className="rating">
-              <span className="score">10.0</span>
-              <span className="score-label">/ 10</span>
-              <span className="stars">★★★★★</span>
-            </div>
-            <div className="pills">
-              <span className="pill green">No wagering</span>
-              <span className="pill">£10 min deposit</span>
-              <span className="pill">900 slots</span>
-              <span className="pill">24h withdrawal</span>
-            </div>
-            <a href="#" className="btn-play">
-              Claim 300 spins
-            </a>
-          </article>
-
-          <article className="pcard">
-            <span className="rank-badge">2nd</span>
-            <div className="logo">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="brand-img" src="/assets/logos/coral.svg" alt="Coral" />
-            </div>
-            <h3 className="offer">100 Free Spins</h3>
-            <div className="offer-tag">No wagering</div>
-            <div className="rating">
-              <span className="score">9.9</span>
-              <span className="score-label">/ 10</span>
-              <span className="stars">★★★★★</span>
-            </div>
-            <div className="pills">
-              <span className="pill green">No wagering</span>
-              <span className="pill">4,324 slots</span>
-            </div>
-            <a href="#" className="btn-play">
-              Play now
-            </a>
-          </article>
-
-          <article className="pcard">
-            <span className="rank-badge">3rd · Exclusive</span>
-            <div className="logo">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="brand-img" src="/assets/logos/lagbrokes.webp" alt="Ladbrokes" />
-            </div>
-            <h3 className="offer">100 Free Spins</h3>
-            <div className="offer-tag">StrikeWild exclusive</div>
-            <div className="rating">
-              <span className="score">9.9</span>
-              <span className="score-label">/ 10</span>
-              <span className="stars">★★★★★</span>
-            </div>
-            <div className="pills">
-              <span className="pill pink">Exclusive</span>
-              <span className="pill">4,443 slots</span>
-            </div>
-            <a href="#" className="btn-play">
-              Claim exclusive
-            </a>
-          </article>
+          {top.map((o, i) => (
+            <article
+              key={o.id}
+              className={`pcard${i === 0 ? " featured" : ""}`}
+            >
+              <span className="rank-badge">{rankBadge(o, i)}</span>
+              <div className="logo">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="brand-img" src={o.logoUrl} alt={o.brand} />
+              </div>
+              <h3 className="offer">{o.title}</h3>
+              <div className="offer-tag">{o.desc}</div>
+              <div className="rating">
+                <span className="score">{o.rating.toFixed(1)}</span>
+                <span className="score-label">/ 10</span>
+                <span className="stars">★★★★★</span>
+              </div>
+              <div className="pills">
+                {pluralPills(o).map((p, j) => (
+                  <span key={j} className={p.className}>
+                    {p.label}
+                  </span>
+                ))}
+              </div>
+              <a href={o.ctaUrl ?? "#"} className="btn-play">
+                {ctaText(o, i)}
+              </a>
+            </article>
+          ))}
         </div>
       </div>
     </section>

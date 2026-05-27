@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { offers, type FilterKey, type Offer } from "@/lib/offers";
+import type { Offer, FilterKey, RibbonKind } from "@/lib/data";
 
 type FilterValue = "all" | FilterKey;
 type SortValue = "rating" | "spins" | "slots" | "payout";
@@ -14,17 +14,12 @@ const FILTER_CHIPS: { value: FilterValue; label: string }[] = [
   { value: "new", label: "New offer" },
 ];
 
-const RIBBON_LABEL: Record<NonNullable<Offer["ribbon"]>, string> = {
+const RIBBON_LABEL: Record<Exclude<RibbonKind, "">, string> = {
   new: "New offer",
   exclusive: "Exclusive",
   choice: "Best choice",
   code: "Code",
 };
-
-function chipCount(value: FilterValue): number {
-  if (value === "all") return offers.length;
-  return offers.filter((o) => o.filters.includes(value)).length;
-}
 
 function leadingNumber(s: string): number {
   const m = s.match(/\d+/);
@@ -38,15 +33,27 @@ const SORT_FNS: Record<SortValue, (a: Offer, b: Offer) => number> = {
   payout: (a, b) => a.payoutDays - b.payoutDays,
 };
 
-export default function FilterableOffers() {
+interface Props {
+  offers: Offer[];
+}
+
+export default function FilterableOffers({ offers }: Props) {
   const [filter, setFilter] = useState<FilterValue>("all");
   const [sort, setSort] = useState<SortValue>("rating");
   const [visible, setVisible] = useState<number>(7);
 
+  const chipCount = (value: FilterValue): number => {
+    if (value === "all") return offers.length;
+    return offers.filter((o) => o.filters.includes(value)).length;
+  };
+
   const filtered = useMemo(() => {
-    const arr = filter === "all" ? offers.slice() : offers.filter((o) => o.filters.includes(filter));
+    const arr =
+      filter === "all"
+        ? offers.slice()
+        : offers.filter((o) => o.filters.includes(filter));
     return arr.sort(SORT_FNS[sort]);
-  }, [filter, sort]);
+  }, [offers, filter, sort]);
 
   const shown = filtered.slice(0, visible);
   const remaining = filtered.length - visible;
@@ -101,28 +108,32 @@ export default function FilterableOffers() {
         <div className="offers">
           {shown.map((o) => (
             <article
-              key={o.rank}
+              key={o.id}
               className="offer"
               data-filters={o.filters.join(" ")}
               data-rating={o.rating}
               data-slots={o.slots}
               data-payout={o.payoutDays}
             >
-              {o.ribbon && <span className={`ribbon ${o.ribbon}`}>{RIBBON_LABEL[o.ribbon]}</span>}
+              {o.ribbon && (
+                <span className={`ribbon ${o.ribbon}`}>
+                  {RIBBON_LABEL[o.ribbon]}
+                </span>
+              )}
               <div className={`rk${o.rank <= 3 ? " top" : ""}`}>
                 {o.rank < 10 ? `0${o.rank}` : o.rank}
               </div>
               <div className="logo-cell">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="brand-img" src={o.logoSrc} alt={o.brand} />
+                <img className="brand-img" src={o.logoUrl} alt={o.brand} />
               </div>
               <div className="main">
                 <h4>{o.title}</h4>
                 <div className="desc">{o.desc}</div>
                 <div className="tags">
                   {o.tags.map((t, i) => (
-                    <span key={i} className={`pill ${t[0]}`}>
-                      {t[1]}
+                    <span key={i} className={`pill ${t.color}`}>
+                      {t.label}
                     </span>
                   ))}
                 </div>
@@ -136,7 +147,7 @@ export default function FilterableOffers() {
                 <div className="st">★★★★★</div>
               </div>
               <div className="cta-cell">
-                <a href="#" className="btn-play">
+                <a href={o.ctaUrl ?? "#"} className="btn-play">
                   Play
                 </a>
               </div>

@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { faq } from "@/lib/faq";
+import type { FaqEntry } from "@/lib/data";
 
-export default function FAQ() {
+interface Props {
+  faq: FaqEntry[];
+}
+
+export default function FAQ({ faq }: Props) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   const toggle = (i: number) => setOpenIdx((cur) => (cur === i ? null : i));
@@ -28,13 +32,13 @@ export default function FAQ() {
 
         <div className="faq">
           {faq.map((f, i) => (
-            <div key={i} className={`faq-item${openIdx === i ? " open" : ""}`}>
+            <div key={f.id} className={`faq-item${openIdx === i ? " open" : ""}`}>
               <button className="faq-q" type="button" onClick={() => toggle(i)}>
-                <span>{f.q}</span>
+                <span>{f.question}</span>
                 <span className="plus" />
               </button>
               <div className="faq-a">
-                <div className="inner">{f.a}</div>
+                <div className="inner">{f.answer}</div>
               </div>
             </div>
           ))}
