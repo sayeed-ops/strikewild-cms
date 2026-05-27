@@ -55,7 +55,7 @@ export default defineConfig({
     visionTool(),
   ],
   schema: {
-    schemaTypes,
+    types: schemaTypes,
     templates: (prev) =>
       prev.filter((t) => !SINGLETON_TYPES.includes(t.schemaType)),
   },
